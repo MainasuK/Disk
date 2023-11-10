@@ -22,14 +22,55 @@
 
 import Foundation
 
+public struct DiskError: Swift.Error {
+    public let code: Code
+    public let _description: String?
+    public let _failureReason: String?
+    public let _recoverySuggestion: String?
+    
+    public init(code: Code, _description: String?, _failureReason: String?, _recoverySuggestion: String?) {
+        self.code = code
+        self._description = _description
+        self._failureReason = _failureReason
+        self._recoverySuggestion = _recoverySuggestion
+    }
+}
+
+extension DiskError {
+    public enum Code {
+        case noFileFound
+        case serialization
+        case deserialization
+        case invalidFileName
+        case couldNotAccessTemporaryDirectory
+        case couldNotAccessUserDomainMask
+        case couldNotAccessSharedContainer
+    }
+}
+extension DiskError: LocalizedError {
+    public var errorDescription: String? {
+        _description
+    }
+    
+    public var failureReason: String? {
+        _failureReason
+    }
+    
+    public var recoverySuggestion: String? {
+        _recoverySuggestion
+    }
+}
+
 extension Disk {
     
     /// Create custom error that FileManager can't account for
     static func createError(_ errorCode: DiskError.Code, description: String?, failureReason: String?, recoverySuggestion: String?) -> DiskError {
-        let errorInfo: [String: Any] = [NSLocalizedDescriptionKey : description ?? "",
-                                        NSLocalizedRecoverySuggestionErrorKey: recoverySuggestion ?? "",
-                                        NSLocalizedFailureReasonErrorKey: failureReason ?? ""]
-        return NSError(domain: DiskErrorDomain, code: errorCode.rawValue, userInfo: errorInfo) as! DiskError
+        return DiskError(
+            code: errorCode,
+            _description: description,
+            _failureReason: failureReason,
+            _recoverySuggestion: recoverySuggestion
+        )
     }
 }
 

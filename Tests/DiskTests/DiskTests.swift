@@ -6,6 +6,8 @@
 //  Copyright © 2017 Saoud Rizwan. All rights reserved.
 //
 
+#if os(macOS)
+#else
 import XCTest
 import Disk
 
@@ -882,3 +884,4 @@ class DiskTests: XCTestCase {
         }
     }
 }
+#endif
